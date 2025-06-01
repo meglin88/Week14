@@ -1,0 +1,10 @@
+import heapq
+from collections import Counter
+
+class Solution:
+    def topKFrequent(self, nums, k):
+        # Step 1: 統計每個數字的出現次數
+        count = Counter(nums)
+        
+        # Step 2: 使用 heap 取得出現次數最多的 k 個元素
+        return heapq.nlargest(k, count.keys(), key=count.get)
