@@ -1,0 +1,23 @@
+from sortedcontainers import SortedList
+
+class Solution:
+    def containsNearbyAlmostDuplicate(self, nums, k, t):
+        if t < 0 or k <= 0:
+            return False
+        
+        window = SortedList()
+        
+        for i, num in enumerate(nums):
+            # 找出視窗中是否有數字在 [num - t, num + t] 之間
+            pos = window.bisect_left(num - t)
+            if pos < len(window) and abs(window[pos] - num) <= t:
+                return True
+
+            # 加入當前數字到視窗中
+            window.add(num)
+            
+            # 若視窗超出大小 k，移除最舊的元素
+            if i >= k:
+                window.remove(nums[i - k])
+        
+        return False
