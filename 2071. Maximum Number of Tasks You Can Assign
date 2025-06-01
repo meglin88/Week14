@@ -1,0 +1,43 @@
+from bisect import bisect_left
+from sortedcontainers import SortedList
+
+class Solution:
+    def maxTaskAssign(self, tasks, workers, pills, strength):
+        tasks.sort()
+        workers.sort()
+
+        def can_assign(x):
+            task_q = tasks[:x]  # 取最難的 x 個任務
+            available = SortedList(workers[-x:])  # 最強的 x 個工人
+
+            pills_left = pills
+
+            for i in reversed(range(x)):  # 從最難任務開始
+                need = task_q[i]
+                # 嘗試用不吃藥的工人
+                if available and available[-1] >= need:
+                    available.pop()  # 用掉最強工人
+                else:
+                    if pills_left == 0:
+                        return False
+                    # 嘗試找吃藥後可完成的工人
+                    idx = available.bisect_left(need - strength)
+                    if idx == len(available):
+                        return False
+                    available.pop(idx)
+                    pills_left -= 1
+
+            return True
+
+        # Binary search 最大任務數量
+        left, right = 0, min(len(tasks), len(workers))
+        ans = 0
+        while left <= right:
+            mid = (left + right) // 2
+            if can_assign(mid):
+                ans = mid
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        return ans
